@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>House Savings Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>MIT House Savings Calculator</h1>
+
+    <form action="/calculate" method="POST" class="card">
+
+        <label>Select Mode</label>
+        <select name="mode" required>
+            <option value="partA">Part A – Basic Savings</option>
+            <option value="partB">Part B – Savings With Raise</option>
+            <option value="partC">Part C – Optimal Savings Rate</option>
+        </select>
+
+        <h3>Inputs for Part A & Part B</h3>
+
+        <input type="number" step="0.01" name="annual_salary" placeholder="Annual Salary">
+        <input type="number" step="0.001" name="portion_saved" placeholder="Portion Saved (decimal)">
+        <input type="number" step="0.01" name="total_cost" placeholder="Total House Cost">
+
+        <h3>Part B Only</h3>
+        <input type="number" step="0.001" name="semi_raise" placeholder="Semi Annual Raise (decimal)">
+
+        <h3>Part C Only</h3>
+        <input type="number" step="0.01" name="salary" placeholder="Starting Salary">
+
+        <button type="submit">Calculate</button>
+    </form>
+</div>
+
+</body>
+</html>
+
