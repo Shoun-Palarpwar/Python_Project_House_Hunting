@@ -133,8 +133,8 @@ def calculate():
         "Mode": mode,
         "Annual Salary": request.form.get("annual_salary"),
         "Portion Saved": request.form.get("portion_saved"),
-        "Potal_Cost": request.form.get("total_cost"),
-        "Semi_Raise": request.form.get("semi_raise"),
+        "Potal Cost": request.form.get("total_cost"),
+        "Semi Raise": request.form.get("semi_raise"),
         "Salary": request.form.get("salary"),
     }
 
