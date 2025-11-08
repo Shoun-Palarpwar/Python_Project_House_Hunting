@@ -1,4 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import os
+
+if os.path.exists("entries.csv"):
+    os.remove("entries.csv")
 
 app = Flask(__name__)
 
@@ -49,6 +56,20 @@ def calculate_part_b(annual_salary, portion_saved, total_cost, semi_raise):
             monthly_salary *= (1 + semi_raise)
 
     return months
+
+# --- temp ---
+def _append_entry(record: dict):
+    """Append a dict as a row into CSV using pandas. Creates the file if missing."""
+    try:
+        df = pd.DataFrame([record])
+        # coerce numpy types, and ensure consistent column order by appending
+        if not pd.io.common.file_exists(CSV_PATH):
+            df.to_csv(CSV_PATH, index=False)
+        else:
+            df.to_csv(CSV_PATH, mode="a", header=False, index=False)
+    except Exception as e:
+        # for robustness, print the error to console (Flask will show in logs)
+        print("Failed to save entry:", e)
 
 
 # ---------- Part C (Bisection Search) ----------
@@ -106,14 +127,28 @@ def home():
 @app.route("/calculate", methods=["POST"])
 def calculate():
     mode = request.form.get("mode")
+    # collect raw inputs (some fields may be empty depending on mode)
+    raw = {
+        "Timestamp": datetime.utcnow().isoformat(),
+        "mode": mode,
+        "annual_salary": request.form.get("annual_salary"),
+        "portion_saved": request.form.get("portion_saved"),
+        "total_cost": request.form.get("total_cost"),
+        "semi_raise": request.form.get("semi_raise"),
+        "salary": request.form.get("salary"),
+    }
 
     if mode == "partA":
         annual_salary = float(request.form.get("annual_salary"))
         portion_saved = float(request.form.get("portion_saved"))
         total_cost = float(request.form.get("total_cost"))
-
         months = calculate_part_a(annual_salary, portion_saved, total_cost)
         duration = format_duration(months)
+
+        # save entry
+        raw.update({"result_months": months, "result_duration": duration})
+        _append_entry(raw)
+
         return render_template("result.html", result=f"Part A: It will take {duration} to save for the down payment")
 
     elif mode == "partB":
@@ -124,6 +159,10 @@ def calculate():
 
         months = calculate_part_b(annual_salary, portion_saved, total_cost, semi_raise)
         duration = format_duration(months)
+
+        raw.update({"result_months": months, "result_duration": duration})
+        _append_entry(raw)
+
         return render_template("result.html", result=f"Part B: It will take {duration} to save for the down payment")
 
     elif mode == "partC":
@@ -132,14 +171,41 @@ def calculate():
         best_rate, steps = calculate_part_c(salary)
 
         if best_rate is None:
+            raw.update({"result_best_rate": None, "result_steps": steps})
+            _append_entry(raw)
             return render_template("result.html",
                                    result="Part C: Not possible to save for the down payment in 3 years")
 
+        raw.update({"result_best_rate": best_rate, "result_steps": steps})
+        _append_entry(raw)
         return render_template("result.html",
                                result=f"Part C: Best savings rate = {best_rate:.4f} ({best_rate*100:.2f}%), Found in {steps} steps")
 
     return "Invalid Request"
 
 
+# --- persistence helpers using pandas ---
+CSV_PATH = "entries.csv"
+
+
+@app.route("/entries")
+def entries():
+    """Render a simple table of saved form entries.
+
+    If CSV is missing or empty, show a friendly message.
+    """
+    if not pd.io.common.file_exists(CSV_PATH):
+        return render_template("entries.html", table_html=None, message="No entries yet")
+
+    try:
+        df = pd.read_csv(CSV_PATH)
+        # convert to HTML table (bootstrap-less simple table)
+        table_html = df.to_html(classes="entries-table", index=False, na_rep="")
+        print(df.dtypes)
+        return render_template("entries.html", table_html=table_html, message=None)
+    except Exception as e:
+        return render_template("entries.html", table_html=None, message=f"Failed to read entries: {e}")
+
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
+

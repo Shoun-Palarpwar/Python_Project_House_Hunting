@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saved Entries</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .entries-table th, .entries-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .entries-table th {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" style="width: 80%;">
+    <h1>Saved Inputs</h1>
+
+    {% if message %}
+        <div class="result-box">{{ message }}</div>
+    {% endif %}
+
+    {% if table_html %}
+        <div class="result-box" style="overflow-x: scroll;">{{ table_html | safe }}</div>
+    {% endif %}
+
+    <a class="btn" href="/">Back</a>
+</div>
+
+</body>
+</html>

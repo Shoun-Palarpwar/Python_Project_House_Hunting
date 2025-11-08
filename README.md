@@ -28,11 +28,21 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-2. Install Flask (if not already installed):
+2. Install dependencies (Flask + optional libraries used by the project):
 
 ```bash
-pip install Flask
+pip install -r requirements.txt
 ```
+
+Why numpy / pandas?
+--------------------
+
+This project currently uses simple arithmetic for the savings calculations and does not strictly require numpy or pandas. However, the dependencies are included because:
+
+- `numpy` can be useful if you want to vectorize or simulate large numbers of salary/saving scenarios efficiently.
+- `pandas` is handy for logging or exporting results as tables (CSV/Excel) if you want to analyze many different parameter combinations (for example to sweep starting salaries and saving rates and store results).
+
+If you don't need those libraries for your immediate run, installing `Flask` alone is sufficient. The `requirements.txt` includes `numpy` and `pandas` so the environment is ready if you later add analysis/export features.
 
 3. Ensure the static files are in place:
 
@@ -45,6 +55,19 @@ python3 main.py
 ```
 
 5. Open your browser at `http://127.0.0.1:5001/`.
+
+Saving Inputs & Viewing History
+------------------------------
+
+Every time you submit the form, your input and the computed result are saved to `entries.csv` in the project root using pandas. This enables you to keep a history of all calculations.
+
+To view all saved entries, click the "View saved entries" button on the main page, or visit `http://127.0.0.1:5001/entries`. This page displays a table of all previous inputs and results.
+
+If no entries exist, you'll see a friendly message. The table is generated using pandas and updates automatically as new entries are added.
+
+You can open `entries.csv` directly in Excel or any spreadsheet tool for further analysis.
+
+If you want to export the table in a different format (e.g., XLSX), let me know and I can add an export feature.
 
 Command-line usage
 ------------------
