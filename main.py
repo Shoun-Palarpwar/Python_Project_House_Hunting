@@ -130,12 +130,12 @@ def calculate():
     # collect raw inputs (some fields may be empty depending on mode)
     raw = {
         "Timestamp": datetime.utcnow().isoformat(),
-        "mode": mode,
-        "annual_salary": request.form.get("annual_salary"),
-        "portion_saved": request.form.get("portion_saved"),
-        "total_cost": request.form.get("total_cost"),
-        "semi_raise": request.form.get("semi_raise"),
-        "salary": request.form.get("salary"),
+        "Mode": mode,
+        "Annual Salary": request.form.get("annual_salary"),
+        "Portion Saved": request.form.get("portion_saved"),
+        "Potal_Cost": request.form.get("total_cost"),
+        "Semi_Raise": request.form.get("semi_raise"),
+        "Salary": request.form.get("salary"),
     }
 
     if mode == "partA":
